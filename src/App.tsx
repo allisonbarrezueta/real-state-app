@@ -13,7 +13,7 @@ function App() {
             </div>
             <Navbar />
             <div className="w-full flex flex-col h-full p-5">
-                <div className="border-b border-gray-900/10 pb-12 sm:mx-5 lg:mx-auto">
+                <div className="border-b border-gray-900/10 pb-12 sm:mx-5 lg:mx-30">
                     <h2 className="text-base/7 font-semibold text-gray-900">Price Recomendation</h2>
                     <p className="mt-1 text-sm/6 text-gray-600"></p>
 
