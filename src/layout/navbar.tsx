@@ -4,9 +4,9 @@ import { useState } from "react";
 
 const navigation = {
     pages: [
-        { name: "Predictive", href: "" },
+        { name: "Predictive", href: "/" },
         { name: "Stats", href: "stats" },
-        { name: "Exploratory", href: "explore" },
+        { name: "Exploratory", href: "exploratory" },
     ],
 };
 
