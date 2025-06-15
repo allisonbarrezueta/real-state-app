@@ -244,3 +244,8 @@ export const propertyTypeOptions = [
     { value: 4, label: "penthouse" },
     { value: 5, label: "studio" },
 ];
+
+export const operationOptions = [
+    { value: "rent", label: "rent" },
+    { value: "sale", label: "sale" },
+];

@@ -1,24 +1,41 @@
 import Select from "react-select";
 import LocationPicker from "../../component/locationPicker";
-import { districtOptions, municipalitiesOptions, neighborhoodsOptions, propertyTypeOptions } from "../../utils/constants";
+import { districtOptions, municipalitiesOptions, neighborhoodsOptions, propertyTypeOptions, operationOptions } from "../../utils/constants";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import { useState } from "react";
 
 const Predictive = () => {
+    const [location, setLocation] = useState({
+        lat: 41.3851,
+        lng: 2.1734,
+        city: "",
+        neighborhood: "",
+        district: "",
+    });
+    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const data = Object.fromEntries(formData.entries());
+        console.log(data, location);
+        // Handle form submission logic here
+        console.log("Form submitted");
+    };
+    console.log("Location:", location);
     return (
-        <div className="border-b border-gray-900/10 pb-12 sm:mx-5 lg:mx-30">
+        <form className="border-b border-gray-900/10 pb-12 sm:mx-5 lg:mx-30" onSubmit={handleFormSubmit}>
             <h2 className="text-base/7 font-semibold text-gray-900">Price Recomendation</h2>
             <p className="mt-1 text-sm/6 text-gray-600"></p>
 
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+            <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                 <div className="sm:col-span-6">
-                    <LocationPicker />
+                    <LocationPicker setLocation={setLocation} />
                 </div>
                 <div className="sm:col-span-3">
                     <label htmlFor="propertyType" className="block text-sm/6 font-medium text-gray-900">
                         Property type
                     </label>
                     <div className="mt-2 grid grid-cols-1">
-                        <Select options={propertyTypeOptions} />
+                        <Select name="propertyType" required options={propertyTypeOptions} />
                     </div>
                 </div>
 
@@ -26,17 +43,9 @@ const Predictive = () => {
                     <label htmlFor="operation" className="block text-sm/6 font-medium text-gray-900">
                         Operation
                     </label>
+
                     <div className="mt-2 grid grid-cols-1">
-                        <select
-                            id="operation"
-                            name="operation"
-                            autoComplete="property-type"
-                            className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 focus:outline focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                            required>
-                            <option value="sale">Sale</option>
-                            <option value="rent">Rent</option>
-                        </select>
-                        <ChevronDownIcon aria-hidden="true" className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4" />
+                        <Select name="operation" required options={operationOptions} />
                     </div>
                 </div>
                 <div className="sm:col-span-3">
@@ -96,9 +105,10 @@ const Predictive = () => {
                     </label>
                     <div className="mt-2 grid grid-cols-1">
                         <select
-                            id="operation"
-                            name="operation"
+                            id="status"
+                            name="status"
                             autoComplete="property-type"
+                            required
                             className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 focus:outline focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                             <option value="good">Good</option>
                             <option value="renew">Renew</option>
@@ -113,7 +123,7 @@ const Predictive = () => {
                         Neighborhood
                     </label>
                     <div className="mt-2 grid grid-cols-1">
-                        <Select options={neighborhoodsOptions} />
+                        <Select name="neighborhood" required options={neighborhoodsOptions} />
                     </div>
                 </div>
 
@@ -122,7 +132,7 @@ const Predictive = () => {
                         Municipality
                     </label>
                     <div className="mt-2 grid grid-cols-1">
-                        <Select options={municipalitiesOptions} />
+                        <Select name="municipality" required options={municipalitiesOptions} />
                     </div>
                 </div>
 
@@ -131,7 +141,7 @@ const Predictive = () => {
                         District
                     </label>
                     <div className="mt-2 grid grid-cols-1">
-                        <Select options={districtOptions} />
+                        <Select name="district" required options={districtOptions} />
                     </div>
                 </div>
 
@@ -143,6 +153,7 @@ const Predictive = () => {
                         <select
                             id="province"
                             name="province"
+                            required
                             autoComplete="property-type"
                             className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 focus:outline focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                             <option key={0} value={0}>
@@ -245,8 +256,11 @@ const Predictive = () => {
                         </div>
                     </div>
                 </div>
+                <div className="sm:col-span-6 flex justify-center">
+                    <button>Calculate</button>
+                </div>
             </div>
-        </div>
+        </form>
     );
 };
 

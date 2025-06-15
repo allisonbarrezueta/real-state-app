@@ -19,7 +19,12 @@ interface PlaceInfo {
     district: string;
 }
 
-const LocationPicker: React.FC = () => {
+interface LocationPickerProps {
+    setLocation: (location: PlaceInfo) => void;
+}
+
+const LocationPicker: React.FC<LocationPickerProps> = (props) => {
+    const { setLocation } = props;
     const [center, setCenter] = useState(defaultCenter);
     const [placeInfo, setPlaceInfo] = useState<PlaceInfo | null>(null);
     const autocompleteRef = useRef<google.maps.places.SearchBox | null>(null);
@@ -41,6 +46,13 @@ const LocationPicker: React.FC = () => {
             const getComponent = (types: string[]): string => components.find((c: any) => types.every((t) => c.types.includes(t)))?.long_name || "";
 
             setPlaceInfo({
+                lat,
+                lng,
+                city: getComponent(["locality"]),
+                neighborhood: getComponent(["sublocality", "sublocality_level_1"]),
+                district: getComponent(["administrative_area_level_2"]),
+            });
+            setLocation({
                 lat,
                 lng,
                 city: getComponent(["locality"]),
