@@ -52,7 +52,7 @@ const Navbar = () => {
                                     <div className="hidden md:flex md:flex-1 md:items-center">
                                         <a href="#">
                                             <span className="sr-only">Your Company</span>
-                                            <img alt="" src="src/assets/EAEBSB_LOGO.png" className="h-8 w-auto" />
+                                            <img alt="" src="/EAEBSB_LOGO.png" className="h-8 w-auto" />
                                         </a>
                                     </div>
 
