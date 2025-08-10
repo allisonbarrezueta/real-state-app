@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { getOptionsFields, getPriceRecomendation, Options, OptionsFields } from "../../services/housing";
 
 const Predictive = () => {
-    const [location] = useState({
-        lat: 41.3851,
-        lng: 2.1734,
-        city: "",
-        neighborhood: "",
-        district: "",
-    });
+    // const [location] = useState({
+    //     lat: 41.3851,
+    //     lng: 2.1734,
+    //     city: "",
+    //     neighborhood: "",
+    //     district: "",
+    // });
 
     const [options, setOptions] = useState<Record<string, Options[]>>();
     const [price, setPrice] = useState<number>();
