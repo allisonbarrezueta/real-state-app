@@ -3,6 +3,7 @@ import LocationPicker from "../../component/locationPicker";
 import { districtOptions, municipalitiesOptions, neighborhoodsOptions, propertyTypeOptions, operationOptions } from "../../utils/constants";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { useState } from "react";
+import { getOptionsFields, OptionsFields } from "../../services/housing";
 
 const Predictive = () => {
     const [location, setLocation] = useState({
@@ -12,6 +13,10 @@ const Predictive = () => {
         neighborhood: "",
         district: "",
     });
+
+    const propertyTypeOption = getOptionsFields(OptionsFields.PROPERTY_TYPE);
+    console.log({ propertyTypeOption });
+
     const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -20,6 +25,7 @@ const Predictive = () => {
         // Handle form submission logic here
         console.log("Form submitted");
     };
+
     console.log("Location:", location);
     return (
         <form className="border-b border-gray-900/10 pb-12 sm:mx-5 lg:mx-30" onSubmit={handleFormSubmit}>
