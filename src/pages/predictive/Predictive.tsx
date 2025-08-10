@@ -1,12 +1,10 @@
 import Select from "react-select";
-import LocationPicker from "../../component/locationPicker";
-import { districtOptions, municipalitiesOptions, neighborhoodsOptions, propertyTypeOptions, operationOptions } from "../../utils/constants";
-import { ChevronDownIcon } from "@heroicons/react/16/solid";
-import { useState } from "react";
-import { getOptionsFields, OptionsFields } from "../../services/housing";
+import { neighborhoodsOptions } from "../../utils/constants";
+import { useEffect, useState } from "react";
+import { getOptionsFields, getPriceRecomendation, Options, OptionsFields } from "../../services/housing";
 
 const Predictive = () => {
-    const [location, setLocation] = useState({
+    const [location] = useState({
         lat: 41.3851,
         lng: 2.1734,
         city: "",
@@ -14,34 +12,104 @@ const Predictive = () => {
         district: "",
     });
 
-    const propertyTypeOption = getOptionsFields(OptionsFields.PROPERTY_TYPE);
-    console.log({ propertyTypeOption });
+    const [options, setOptions] = useState<Record<string, Options[]>>();
+    const [price, setPrice] = useState<number>();
 
-    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const loadOptions = async () => {
+        const propertyTypeOptions = await getOptionsFields(OptionsFields.PROPERTY_TYPE);
+        const operationOptions = await getOptionsFields(OptionsFields.OPERATION);
+        const exteriorOptions = await getOptionsFields(OptionsFields.EXTERIOR);
+        const provinceOptions = await getOptionsFields(OptionsFields.PROVINCE);
+        const municipalitiesOptions = await getOptionsFields(OptionsFields.MUNICIPALITY);
+        const districtOptions = await getOptionsFields(OptionsFields.DISTRICT);
+        const neighborhoodOptions = await getOptionsFields(OptionsFields.NEIGHBORHOOD);
+        const statusOptions = await getOptionsFields(OptionsFields.STATUS);
+        const newDevelopmentOptions = await getOptionsFields(OptionsFields.NEW_DEVELOPMENT);
+        const hasLiftOptions = await getOptionsFields(OptionsFields.HAS_LIFT);
+
+        return {
+            propertyTypeOptions,
+            operationOptions,
+            exteriorOptions,
+            provinceOptions,
+            municipalitiesOptions,
+            districtOptions,
+            neighborhoodOptions,
+            statusOptions,
+            newDevelopmentOptions,
+            hasLiftOptions,
+        };
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const loadedOptions = await loadOptions();
+            setOptions(loadedOptions);
+        };
+
+        fetchData();
+    }, []);
+
+    const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const data = Object.fromEntries(formData.entries());
-        console.log(data, location);
-        // Handle form submission logic here
-        console.log("Form submitted");
+        const operation = data.operation as string;
+        if (!operation) {
+            alert("Operation field is required");
+            return;
+        }
+        const hasLift = data.hasLift === "on" ? options?.hasLiftOptions.find((option) => option.label == "True")?.value : options?.hasLiftOptions.find((option) => option.label == "False")?.value;
+        const exterior = data.exterior === "on" ? options?.exteriorOptions.find((option) => option.label == "True")?.value : options?.exteriorOptions.find((option) => option.label == "False")?.value;
+        const newDevelopment =
+            data.newDevelopment === "on"
+                ? options?.newDevelopmentOptions.find((option) => option.label == "True")?.value
+                : options?.newDevelopmentOptions.find((option) => option.label == "False")?.value;
+
+        const body = {
+            propertyType: parseInt(data.propertyType as string),
+            operation: parseInt(data.operation as string),
+            size: parseInt(data.size as string),
+            exterior,
+            rooms: parseInt(data.rooms as string),
+            bathrooms: parseInt(data.bathrooms as string),
+            province: parseInt(data.province as string),
+            municipality: parseInt(data.municipality as string),
+            district: parseInt(data.district as string),
+            neighborhood: parseInt(data.neighborhood as string),
+            status: parseInt(data.status as string),
+            hasLift,
+            priceByArea: parseInt(String(data.priceByArea ?? "0")),
+            newDevelopment,
+        };
+        console.log({ body });
+        const response = await getPriceRecomendation(body);
+
+        setPrice(Number(response.price));
+        console.log("Form submitted", response);
     };
 
-    console.log("Location:", location);
     return (
         <form className="border-b border-gray-900/10 pb-12 sm:mx-5 lg:mx-30" onSubmit={handleFormSubmit}>
-            <h2 className="text-base/7 font-semibold text-gray-900">Price Recomendation</h2>
+            {!price ? (
+                <h2 className="text-base/7 font-semibold text-gray-900">Price Recomendation</h2>
+            ) : (
+                <h2 className="text-base/7 font-semibold text-gray-900">
+                    Price Recomendation: <span className="font-bold">€ {price.toFixed(2)}</span>
+                </h2>
+            )}
             <p className="mt-1 text-sm/6 text-gray-600"></p>
 
             <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                <div className="sm:col-span-6">
+                {/* <div className="sm:col-span-6">
                     <LocationPicker setLocation={setLocation} />
-                </div>
+                </div> */}
                 <div className="sm:col-span-3">
                     <label htmlFor="propertyType" className="block text-sm/6 font-medium text-gray-900">
                         Property type
                     </label>
                     <div className="mt-2 grid grid-cols-1">
-                        <Select name="propertyType" required options={propertyTypeOptions} />
+                        <Select name="propertyType" required options={options?.propertyTypeOptions} />
                     </div>
                 </div>
 
@@ -51,7 +119,7 @@ const Predictive = () => {
                     </label>
 
                     <div className="mt-2 grid grid-cols-1">
-                        <Select name="operation" required options={operationOptions} />
+                        <Select name="operation" required options={options?.operationOptions} />
                     </div>
                 </div>
                 <div className="sm:col-span-3">
@@ -80,7 +148,7 @@ const Predictive = () => {
                             id="rooms"
                             name="rooms"
                             type="number"
-                            min={0}
+                            min={1}
                             autoComplete="given-name"
                             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                             required
@@ -110,17 +178,7 @@ const Predictive = () => {
                         Status
                     </label>
                     <div className="mt-2 grid grid-cols-1">
-                        <select
-                            id="status"
-                            name="status"
-                            autoComplete="property-type"
-                            required
-                            className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 focus:outline focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                            <option value="good">Good</option>
-                            <option value="renew">Renew</option>
-                            <option value="newdevelopment">New development</option>
-                        </select>
-                        <ChevronDownIcon aria-hidden="true" className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4" />
+                        <Select name="status" required options={options?.statusOptions} />
                     </div>
                 </div>
 
@@ -138,7 +196,7 @@ const Predictive = () => {
                         Municipality
                     </label>
                     <div className="mt-2 grid grid-cols-1">
-                        <Select name="municipality" required options={municipalitiesOptions} />
+                        <Select name="municipality" required options={options?.municipalitiesOptions} />
                     </div>
                 </div>
 
@@ -147,7 +205,7 @@ const Predictive = () => {
                         District
                     </label>
                     <div className="mt-2 grid grid-cols-1">
-                        <Select name="district" required options={districtOptions} />
+                        <Select name="district" required options={options?.districtOptions} />
                     </div>
                 </div>
 
@@ -156,35 +214,7 @@ const Predictive = () => {
                         Province
                     </label>
                     <div className="mt-2 grid grid-cols-1">
-                        <select
-                            id="province"
-                            name="province"
-                            required
-                            autoComplete="property-type"
-                            className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 focus:outline focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                            <option key={0} value={0}>
-                                Barcelona
-                            </option>
-                        </select>
-                        <ChevronDownIcon aria-hidden="true" className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4" />
-                    </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                    <label htmlFor="country" className="block text-sm/6 font-medium text-gray-900">
-                        Country
-                    </label>
-                    <div className="mt-2 grid grid-cols-1">
-                        <select
-                            id="country"
-                            name="country"
-                            autoComplete="property-type"
-                            className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 focus:outline focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                            <option key={"spain"} value={0}>
-                                Spain
-                            </option>
-                        </select>
-                        <ChevronDownIcon aria-hidden="true" className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4" />
+                        <Select name="province" required options={options?.provinceOptions} />
                     </div>
                 </div>
 
