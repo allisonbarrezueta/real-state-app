@@ -11,6 +11,7 @@ const Predictive = () => {
     //     neighborhood: "",
     //     district: "",
     // });
+    console.log();
 
     const [options, setOptions] = useState<Record<string, Options[]>>();
     const [price, setPrice] = useState<number>();
