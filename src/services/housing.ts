@@ -40,7 +40,6 @@ export interface PriceRecommendationRequest {
     bathrooms: number;
     province: number;
     municipality: number;
-    district: number;
     neighborhood: number;
     status: number;
     hasLift: number | undefined;

@@ -4,15 +4,6 @@ import { useEffect, useState } from "react";
 import { getOptionsFields, getPriceRecomendation, Options, OptionsFields } from "../../services/housing";
 
 const Predictive = () => {
-    // const [location] = useState({
-    //     lat: 41.3851,
-    //     lng: 2.1734,
-    //     city: "",
-    //     neighborhood: "",
-    //     district: "",
-    // });
-    console.log();
-
     const [options, setOptions] = useState<Record<string, Options[]>>();
     const [price, setPrice] = useState<number>();
 
@@ -22,7 +13,6 @@ const Predictive = () => {
         const exteriorOptions = await getOptionsFields(OptionsFields.EXTERIOR);
         const provinceOptions = await getOptionsFields(OptionsFields.PROVINCE);
         const municipalitiesOptions = await getOptionsFields(OptionsFields.MUNICIPALITY);
-        const districtOptions = await getOptionsFields(OptionsFields.DISTRICT);
         const neighborhoodOptions = await getOptionsFields(OptionsFields.NEIGHBORHOOD);
         const statusOptions = await getOptionsFields(OptionsFields.STATUS);
         const newDevelopmentOptions = await getOptionsFields(OptionsFields.NEW_DEVELOPMENT);
@@ -34,7 +24,6 @@ const Predictive = () => {
             exteriorOptions,
             provinceOptions,
             municipalitiesOptions,
-            districtOptions,
             neighborhoodOptions,
             statusOptions,
             newDevelopmentOptions,
@@ -76,7 +65,6 @@ const Predictive = () => {
             bathrooms: parseInt(data.bathrooms as string),
             province: parseInt(data.province as string),
             municipality: parseInt(data.municipality as string),
-            district: parseInt(data.district as string),
             neighborhood: parseInt(data.neighborhood as string),
             status: parseInt(data.status as string),
             hasLift,
@@ -198,15 +186,6 @@ const Predictive = () => {
                     </label>
                     <div className="mt-2 grid grid-cols-1">
                         <Select name="municipality" required options={options?.municipalitiesOptions} />
-                    </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                    <label htmlFor="district" className="block text-sm/6 font-medium text-gray-900">
-                        District
-                    </label>
-                    <div className="mt-2 grid grid-cols-1">
-                        <Select name="district" required options={options?.districtOptions} />
                     </div>
                 </div>
 
