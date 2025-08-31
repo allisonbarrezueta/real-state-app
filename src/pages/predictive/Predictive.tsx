@@ -68,8 +68,8 @@ const Predictive = () => {
             neighborhood: parseInt(data.neighborhood as string),
             status: parseInt(data.status as string),
             hasLift,
-            priceByArea: parseInt(String(data.priceByArea ?? "0")),
             newDevelopment,
+            priceByArea: parseInt(String(data.priceByArea ?? "0")),
         };
         console.log({ body });
         const response = await getPriceRecomendation(body);
